@@ -4,6 +4,7 @@ import logging
 import select
 from common.utils import OperateMessage, PrepareConnection
 from common.decorators import log
+from common.descriptors import Port
 from log import server_log_config
 
 SERVER_LOGGER = logging.getLogger('server')
@@ -13,6 +14,7 @@ class OperateServer(OperateMessage):
     """
     The class contains methods for managing the server.
     """
+    port = Port()
 
     def __init__(self, listen_address, listen_port):
         self.address = listen_address

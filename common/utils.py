@@ -91,14 +91,14 @@ class PrepareConnection:
 
         parser = cls.get_parser(configs)
         namespace = parser.parse_args(sys.argv[1:])
-        try:
-            listen_port = namespace.p
-            if listen_port < 1024 or listen_port > 65535:
-                raise ValueError
-        except ValueError:
-            SERVER_LOGGER.critical(f'Номер порта должен быть числом '
-                                   f'в диапазоне от 1024 до 65535.')
-            sys.exit(1)
+
+        listen_port = namespace.p
+        #     if listen_port < 1024 or listen_port > 65535:
+        #         raise ValueError
+        # except ValueError:
+        #     SERVER_LOGGER.critical(f'Номер порта должен быть числом '
+        #                            f'в диапазоне от 1024 до 65535.')
+        #     sys.exit(1)
         try:
             listen_address = namespace.a
         except IndexError:
