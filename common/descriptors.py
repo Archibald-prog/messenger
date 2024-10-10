@@ -1,5 +1,8 @@
 import logging
 import sys
+from argparse import ArgumentError
+
+from common.errors import NoArgException
 
 SERVER_LOGGER = logging.getLogger('server')
 
@@ -16,3 +19,14 @@ class Port:
                                    f'от 1024 до 65535.')
             sys.exit(1)
         instance.__dict__[self.name] = value
+
+
+class Address:
+
+    def __set_name__(self, owner, name):
+        self.name = name
+
+    def __set__(self, instance, value):
+        instance.__dict__[self.name] = value
+
+
