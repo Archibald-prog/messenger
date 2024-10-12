@@ -3,12 +3,17 @@ import os.path
 import sys
 import logging
 import argparse
+from .errors import ArgumentParserError
 from log import server_log_config
 from log import client_log_config
 
-
 SERVER_LOGGER = logging.getLogger('server')
 CLIENT_LOGGER = logging.getLogger('client')
+
+class EnhancedArgParser(argparse.ArgumentParser):
+    def error(self, message):
+        self.print_help()
+        raise ArgumentParserError(message)
 
 
 class PrepareConnection:
@@ -57,7 +62,7 @@ class PrepareConnection:
 
     @classmethod
     def get_parser(cls, configs, is_server=True):
-        parser = argparse.ArgumentParser()
+        parser = EnhancedArgParser()
         if not is_server:
             parser.add_argument('a', nargs='?',
                                 default=configs.get('DEFAULT_IP_ADDRESS'))
@@ -65,8 +70,9 @@ class PrepareConnection:
                                 default=configs.get('DEFAULT_PORT'), type=int)
             parser.add_argument('-n', '--name', default=None)
             return parser
-        parser.add_argument('-p', default=configs.get('DEFAULT_PORT'), type=int)
-        parser.add_argument('-a', default='')
+        parser.add_argument('-p', default=configs.get('DEFAULT_PORT'), type=int,
+                            help='Enter the port number the server will listen on')
+        parser.add_argument('-a', default='', help='Enter the server IP-address')
         return parser
 
     @classmethod
@@ -90,21 +96,14 @@ class PrepareConnection:
             return address, client_name
 
         parser = cls.get_parser(configs)
-        namespace = parser.parse_args(sys.argv[1:])
-
-        listen_port = namespace.p
-        #     if listen_port < 1024 or listen_port > 65535:
-        #         raise ValueError
-        # except ValueError:
-        #     SERVER_LOGGER.critical(f'Номер порта должен быть числом '
-        #                            f'в диапазоне от 1024 до 65535.')
-        #     sys.exit(1)
         try:
+            namespace = parser.parse_args(sys.argv[1:])
+            listen_port = namespace.p
             listen_address = namespace.a
-        except IndexError:
-            SERVER_LOGGER.critical(f'После параметра \'a\' должен быть указан адрес, '
-                                   f'который будет слушать сервер.')
-            sys.exit(1)
+        except ArgumentParserError:
+            print("\nRequired arguments were not specified!!!")
+            sys.exit(2)
+
         SERVER_LOGGER.info(f'Сервер запущен на порту {listen_port} '
                            f'по адресу {listen_address}.')
         return listen_address, listen_port

@@ -1,8 +1,5 @@
 import logging
 import sys
-from argparse import ArgumentError
-
-from common.errors import NoArgException
 
 SERVER_LOGGER = logging.getLogger('server')
 
@@ -28,5 +25,3 @@ class Address:
 
     def __set__(self, instance, value):
         instance.__dict__[self.name] = value
-
-
