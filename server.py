@@ -1,19 +1,18 @@
-from socket import socket, AF_INET, SOCK_STREAM
+import socket
 import os
 import logging
 import select
 from common.utils import OperateMessage, PrepareConnection
 from common.decorators import log
 from common.descriptors import Address, Port
+from common.metaclasses import ServerMaker
 from log import server_log_config
 
 SERVER_LOGGER = logging.getLogger('server')
 
 
-class OperateServer(OperateMessage):
-    """
-    The class contains methods for managing the server.
-    """
+class OperateServer(OperateMessage, metaclass=ServerMaker):
+
     address = Address()
     port = Port()
 
@@ -26,7 +25,7 @@ class OperateServer(OperateMessage):
         self.names = dict()
 
     def init_socket(self, CONFIGS):
-        serv_sock = socket(AF_INET, SOCK_STREAM)
+        serv_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         serv_sock.bind((self.address, self.port))
         serv_sock.settimeout(0.5)
 
@@ -130,12 +129,11 @@ class OperateServer(OperateMessage):
             SERVER_LOGGER.error(f"Пользователь {message[CONFIGS.get('DESTINATION')]} "
                                 f"не зарегистрирован. ")
 
+
 class StartServer(PrepareConnection, OperateServer):
-    """The class is responsible for initializing the server."""
 
     @classmethod
     def main(cls, path_to_config):
-
         CONFIGS = cls.load_configs(path_to_config)
         listen_address, listen_port = cls.parse_argv(CONFIGS)
 
