@@ -7,6 +7,7 @@ import time
 from socket import socket, AF_INET, SOCK_STREAM
 from common.utils import OperateMessage, PrepareConnection
 from common.decorators import Log
+from common.metaclasses import ClientMaker
 from log import client_log_config
 
 CLIENT_LOGGER = logging.getLogger('client')
@@ -71,6 +72,7 @@ class ClientSender(threading.Thread, OperateMessage):
         print('help - вывести подсказки по командам')
         print('exit - выход из программы')
 
+
 class ClientReader(threading.Thread, OperateMessage):
     def __init__(self, account_name, sock, CONFIGS):
         self.account_name = account_name
@@ -102,10 +104,7 @@ class ClientReader(threading.Thread, OperateMessage):
                 break
 
 
-class OperateClient(OperateMessage, PrepareConnection):
-    """
-    The class contains methods for managing the client.
-    """
+class OperateClient(OperateMessage, PrepareConnection, metaclass=ClientMaker):
     @Log()
     def create_presence(self, CONFIGS, account_name):
         presence_message = {
@@ -136,13 +135,13 @@ class OperateClient(OperateMessage, PrepareConnection):
             presence_message = self.create_presence(CONFIGS, client_name)
             self.send_message(transport, presence_message, CONFIGS)
             answer = self.process_response(self.get_message(transport, CONFIGS),
-                                            CONFIGS)
+                                           CONFIGS)
             CLIENT_LOGGER.info(f'Установлено соединение с сервером. '
                                f'Ответ сервера: {answer}.')
             return transport
         except(ValueError, json.JSONDecodeError):
-                CLIENT_LOGGER.critical(f'Не удалось декодировать сообщение сервера.')
-                sys.exit(1)
+            CLIENT_LOGGER.critical(f'Не удалось декодировать сообщение сервера.')
+            sys.exit(1)
 
     @classmethod
     def main(cls, path_to_config):

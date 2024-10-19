@@ -33,3 +33,31 @@ class ServerMaker(type):
             super().__init__(name, bases, dct)
 
 
+class ClientMaker(type):
+    def __init__(cls, name, bases, dct):
+        attrs = []
+        # pprint(dct)
+        # print()
+
+        for func in dct:
+            try:
+                ret = dis.get_instructions(dct[func])
+            except TypeError:
+                pass
+            else:
+                for i in ret:
+                    # print(i, '\n')
+                    if i.opname == 'LOAD_ATTR':
+                        if i.argval not in attrs:
+                            attrs.append(i.argval)
+
+        print(f'attributes: {attrs}\n')
+        for command in ('accept', 'listen', 'socket'):
+            if command in attrs:
+                raise TypeError("Incorrect use of functions "
+                                "was detected in the class!")
+            if 'get_message' in attrs or 'send_message' in attrs:
+                pass
+            else:
+                raise TypeError("No calls to functions to work with sockets!")
+        super().__init__(name, bases, dct)
