@@ -1,5 +1,6 @@
 import logging
 import sys
+import ipaddress
 
 SERVER_LOGGER = logging.getLogger('server')
 
@@ -24,4 +25,10 @@ class Address:
         self.name = name
 
     def __set__(self, instance, value):
+        if value:
+            try:
+                ipaddress.ip_address(value)
+            except ValueError as e:
+                SERVER_LOGGER.critical(f'Incorrect IP address: {e}.')
+                sys.exit(1)
         instance.__dict__[self.name] = value
