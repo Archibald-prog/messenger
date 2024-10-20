@@ -59,5 +59,6 @@ class ClientMaker(type):
             if 'get_message' in attrs or 'send_message' in attrs:
                 pass
             else:
-                raise TypeError("No calls to functions to work with sockets!")
+                raise TypeError("No calls to functions "
+                                "to work with sockets!")
         super().__init__(name, bases, dct)
