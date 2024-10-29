@@ -4,6 +4,7 @@
   "MAX_CONNECTIONS": 5,
   "MAX_PACKAGE_SIZE": 1024,
   "ENCODING": "utf-8",
+  "SERVER_DATABASE": "sqlite:///server_base.db3",
   "ACTION": "action",
   "TIME": "time",
   "USER": "user",

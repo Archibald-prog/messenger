@@ -29,6 +29,7 @@ class PrepareConnection:
             "MAX_CONNECTIONS",
             "MAX_PACKAGE_SIZE",
             "ENCODING",
+            "SERVER_DATABASE",
             "ACTION",
             "TIME",
             "USER",
